@@ -12,18 +12,22 @@ import darklogo from "./../../assets/images/darklogo.png";
 import SocialIcon from "../SocialIcon/SocialIcon.jsx";
 import ContactComponent from "../ContactComponent/ContactComponent.jsx";
 import BreadCrum from "../BreadCrum/BreadCrum.jsx";
-import CartDrawer from "../CartDrawer/CartDrawer.jsx";
+import AuthDrawer from "../AuthDrawer/AuthDrawer.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { upateNewsCards } from "../../Redux/Slice/NewsSlice/NewsSlice.js";
 import { updateProductsCards } from "../../Redux/Slice/ProductSlice/ProductSlice.js";
+import { handleAuth } from "../../Redux/Slice/UserSlice/UserSlice.js";
+import { handleSnackAlert } from "../../Redux/Slice/SnackAlertSlice/SnackAlertSlice.js";
 const Header = () => {
   const dispatch = useDispatch()
   const news = useSelector(state=>state.news)
+  const auth = useSelector(state=>state.auth)
   const navigate = useNavigate();
   const {pathname} = useLocation()
   const [value, setValue] = React.useState(0);
   const [input, setInput] = React.useState("")
-  const [open, setOpen] = React.useState(false);
+  const [openAuthForm, setOpenAuthForm] = React.useState(false);
+  const [openProfileDropDown, setOpenProfileDropDown] = React.useState(false)
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -38,13 +42,31 @@ const Header = () => {
   },[pathname])
 
   const showCrumbs = ()=>{
-    if(location.pathname !== "/"){
+    if(location.pathname !== "/" && location.pathname !== "/profile"){
       return <BreadCrum/>
     }
   }
   const cb=(id)=>{
-    if(id==="cart"){
-     return setOpen(true)
+    if(id==="unauthenticated"){
+     return setOpenAuthForm(true)
+    }
+    if(id==="authenticated"){
+      return navigate("/profile")
+    }
+    
+    if(id==="logout"){
+      dispatch(handleSnackAlert({
+        open:true,
+        severity:"success",
+        message:"Logout successfully"
+    }))
+
+      dispatch(handleAuth({ user: null, token: null, authenticated: false }))
+      if(pathname!=="/"){
+        navigate("/")
+
+      }
+    
     }
 
     if(pathname?.toLowerCase().includes("news")){
@@ -59,6 +81,7 @@ const Header = () => {
     }
 
   }
+  const headerIconsConditionallyRender = headerIcons.filter(item=>item.condition(auth))
   return (
     <Box sx={{ width: "100%" }}>
    
@@ -109,7 +132,6 @@ const Header = () => {
               sx={{
                 borderRight: "1px solid  #E4E2D7",
                 minHeight: "36px",
-                display: "flex",
                 alignItems: "center",
                 display:{xs:"none", md:"block"}
 
@@ -144,7 +166,7 @@ const Header = () => {
                 alignItems:"center"
               }}
             >
-              {headerIcons.map((x, i) => {
+              {headerIconsConditionallyRender.map((x, i) => {
                 return <HeaderIcon cb={cb} key={i} id={x.id}component={x.icon} />
                 })}
             </Box>
@@ -152,7 +174,7 @@ const Header = () => {
         </Box>
       </Box>
       {showCrumbs()}
-      <CartDrawer open={open} handleClose={()=>{setOpen(false)}} handleOpen={()=>{setOpen(true)}}/>
+      <AuthDrawer open={openAuthForm} handleClose={()=>{setOpenAuthForm(false)}} handleOpen={()=>{setOpenAuthForm(true)}}/>
     </Box>
   );
 };

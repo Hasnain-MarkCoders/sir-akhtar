@@ -11,6 +11,7 @@ import envelope from "./../assets/images/envelope.png";
 import marker from "./../assets/images/marker.png";
 import cart from "./../assets/images/cart.png";
 import user from "./../assets/images/userdark.png";
+import authenticatedUser from "./../assets/images/authenticatedUser.png";
 import search from "./../assets/images/search.png";
 import greenPhone from "./../assets/images/greenPhone.png";
 import mail from "./../assets/images/mail.png";
@@ -34,6 +35,8 @@ import techcard2 from "./../assets/images/techcard2.jpg";
 import dsnotes from "./../assets/images/dsnotes.jpg";
 import dsAccounting from "./../assets/images/dsaccounting.jpg";
 import dsMaths from "./../assets/images/dsMaths.jpg";
+import logout from "./../assets/images/logout.png";
+
 
 import honey from "./../assets/images/honey.png";
 import honeyIcon from "./../assets/images/honeyIcon.png";
@@ -172,14 +175,28 @@ export const tabsArray = [
 export const headerIcons = [
   {
     icon: <img src={search}></img>,
-    id:"search"
+    id: "search",
+    condition: ({ isShow }) => isShow
   },
   {
     icon: <img style={{width:"32px"}} src={user}></img>,
-    id:"cart"
+    id: "unauthenticated",
+    condition: ({ auth }) => !auth?.authenticated
   },
+  {
+    icon: <img style={{width:"32px"}} src={authenticatedUser}></img>,
+    id: "authenticated",
+    condition: ({ auth }) => auth?.authenticated
+  },
+  {
+    icon: <img style={{width:"32px"}} src={logout}></img>,
+    id: "logout",
+    condition: ({ auth }) => auth?.authenticated
+  }
 ];
 
+export const headerIconsConditionallyRender = (auth={}, isShow = true, cb=()=>{}) => 
+  headerIcons.filter(item => item.condition({ auth, isShow }));
 export const contactHeaderData = [
   {
     src: greenPhone,

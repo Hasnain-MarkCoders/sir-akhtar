@@ -18,7 +18,7 @@ const SnackAlert = ({
     dispatch(handleSnackAlert({...snackAlert}))
     // Reset the timer when the message or open state changes
     const timer = setTimeout(() => {
-      dispatch(handleSnackAlert({message:"", severity:"success", open:false}))
+      dispatch(handleSnackAlert({open:false}))
     }, 5000);
     // Cleanup function to clear the timer
     return () => clearTimeout(timer);

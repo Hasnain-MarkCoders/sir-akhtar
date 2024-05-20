@@ -6,7 +6,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { Drawer as MuiDrawer, Typography } from "@mui/material";
+import { Menu, MenuItem, Drawer as MuiDrawer, Typography } from "@mui/material";
+import { Dropdown as MuiDropDown } from '@mui/base/Dropdown';
 import { IoCloseOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -16,7 +17,7 @@ import inion from "./../../assets/images/onion.png";
 import CartItem from "../CartItem/CartItem";
 import Login from "../Login/Login";
 import Signup from "../SignUp/SignUp";
-const CartDrawer = ({
+const AuthDrawer = ({
   open = false,
   handleClose = () => {},
   handleOpen = () => {},
@@ -24,7 +25,7 @@ const CartDrawer = ({
   const navigate = useNavigate();
   const [isDisabled, setIsDisabled] = React.useState(false) 
   const [toggleAuthForms, setToggleAuthForms] = React.useState(false)
-  const data = useSelector((state) => state.cart);
+  const auth = useSelector((state) => state.auth);
   const handleDisbledCloseButton =()=>setIsDisabled(prev=>!prev)
   const toggleAuthForm = ()=>setToggleAuthForms(prev=>!prev)
   const DrawerList = (
@@ -49,14 +50,10 @@ const CartDrawer = ({
        {toggleAuthForms?
        <Signup  toggleAuthForm={toggleAuthForm} cb={handleDisbledCloseButton}/>
         :
-        <Login toggleAuthForm={toggleAuthForm} cb={handleDisbledCloseButton}/>
+        <Login closeAuthForm={handleClose} toggleAuthForm={toggleAuthForm} cb={handleDisbledCloseButton}/>
         }
     </Box>
   );
-  React.useEffect(()=>{
-
-console.log(isDisabled)
-  },[isDisabled])
 
   return (
     <div>
@@ -96,10 +93,11 @@ console.log(isDisabled)
             }}
           />}
         </Box>
+        
         {DrawerList}
       </MuiDrawer>
     </div>
   );
 };
 
-export default CartDrawer;
+export default AuthDrawer;

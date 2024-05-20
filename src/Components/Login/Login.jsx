@@ -3,7 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import openEye from "./../../assets/images/eye.png";
 import closeEye from "./../../assets/images/closed-eye.png";
 import { ValidateEmptyFields, joivalidatePassword } from "../../utils/utils";
-const Login = ({cb=()=>{}, toggleAuthForm=()=>{}}) => {
+import {Login as login} from "./../../API/EndPoints/Endpoints"
+import { useDispatch } from "react-redux";
+import { handleAuth } from "../../Redux/Slice/UserSlice/UserSlice";
+import { handleSnackAlert } from "../../Redux/Slice/SnackAlertSlice/SnackAlertSlice";
+const Login = ({cb=()=>{}, toggleAuthForm=()=>{}, closeAuthForm=()=>{}}) => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [details, setDetails] = useState({
     email: "",
@@ -34,18 +39,31 @@ const Login = ({cb=()=>{}, toggleAuthForm=()=>{}}) => {
     const isValid = joivalidatePassword(details, setErrors);
     if (isValid) {
       setErrors({});
-      let res ={success:true};
-      if (res?.success) {
-             setTimeout(()=>{
-            cb()
+        const response = await login(details)
+        console.log(response)
+      if (response?.success) {
+            const data = {user: response.user, token:response.token, authenticated:true }
+            dispatch(handleAuth(data))
             setIsLoading(false)
             setDisabled(false)
-        }, 5000)
-         
-      }   else{
+            cb()
+            closeAuthForm()
+            dispatch(handleSnackAlert( {
+              open:false,
+          }))
+      } 
+      
+      else{
         cb()
         setDisabled(false)
         setIsLoading(false);
+        dispatch(handleSnackAlert( {
+          open:true,
+          severity:"error",
+          message:"Login Failed."
+      }))
+      // closeAuthForm()
+
       }
       
      
