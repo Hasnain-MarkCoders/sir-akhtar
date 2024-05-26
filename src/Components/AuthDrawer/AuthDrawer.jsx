@@ -48,7 +48,7 @@ const AuthDrawer = ({
     >
      
        {toggleAuthForms?
-       <Signup  toggleAuthForm={toggleAuthForm} cb={handleDisbledCloseButton}/>
+       <Signup closeAuthForm={handleClose}  toggleAuthForm={toggleAuthForm} cb={handleDisbledCloseButton}/>
         :
         <Login closeAuthForm={handleClose} toggleAuthForm={toggleAuthForm} cb={handleDisbledCloseButton}/>
         }

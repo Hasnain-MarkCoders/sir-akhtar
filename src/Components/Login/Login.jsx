@@ -49,7 +49,9 @@ const Login = ({cb=()=>{}, toggleAuthForm=()=>{}, closeAuthForm=()=>{}}) => {
             cb()
             closeAuthForm()
             dispatch(handleSnackAlert( {
-              open:false,
+              open:true,
+              severity:"success",
+              message:"Login successfully."
           }))
       } 
       

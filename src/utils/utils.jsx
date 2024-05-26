@@ -175,28 +175,27 @@ export const tabsArray = [
 export const headerIcons = [
   {
     icon: <img src={search}></img>,
-    id: "search",
-    condition: ({ isShow }) => isShow
+    id:"search",
+    condition: (auth) => true
   },
   {
     icon: <img style={{width:"32px"}} src={user}></img>,
-    id: "unauthenticated",
-    condition: ({ auth }) => !auth?.authenticated
+    id:"unauthenticated",
+    condition: (auth) => !auth.authenticated
   },
   {
     icon: <img style={{width:"32px"}} src={authenticatedUser}></img>,
-    id: "authenticated",
-    condition: ({ auth }) => auth?.authenticated
+    id:"authenticated",
+    condition: (auth) => auth.authenticated
   },
   {
     icon: <img style={{width:"32px"}} src={logout}></img>,
-    id: "logout",
-    condition: ({ auth }) => auth?.authenticated
+    id:"logout",
+    condition: (auth) => auth.authenticated
   }
 ];
 
-export const headerIconsConditionallyRender = (auth={}, isShow = true, cb=()=>{}) => 
-  headerIcons.filter(item => item.condition({ auth, isShow }));
+export const headerIconsConditionallyRender =(auth)=> headerIcons.filter(item=>item.condition(auth))
 export const contactHeaderData = [
   {
     src: greenPhone,
@@ -567,6 +566,17 @@ export const DetailedNewsFactCard = [
     text:"Bringing Food Production Back To Cities"
   }
 ] 
+
+export const manageContent = [
+  {
+    title:"Add Video",
+    link:"/admin/add-video"
+  },
+  {
+    title:"Manage Category",
+    link:"/admin/manage-content"
+  }
+] 
 const localFormData = JSON.parse(window?.localStorage?.getItem("commentFormData"))
 export const newsInputs = [
   {
@@ -597,6 +607,24 @@ const filterData = (data, value, field)=>{
   const filteredData = data.filter(item[field]===data[field])
   return filterData.length<1?[]:filteredData
 }
+export const joiSignUpSchema = Joi.object({
+  email: Joi.string()
+    .email({ tlds: { allow: false } })
+    .required(),
+    username:Joi.string()
+    .required(),
+  password: Joi.string()
+    .required()
+    .pattern(
+      new RegExp(
+        '^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+{}":;<>,.?~\\-]).{8,}$'
+      )
+    )
+    .messages({
+      "string.pattern.base":
+        "Password must contain at least 1 upper case, 1 number, 1 special character, and atmost 8 characters long.",
+    }),
+});
 
 export const joiPasswordSchema = Joi.object({
   email: Joi.string()
@@ -616,6 +644,20 @@ export const joiPasswordSchema = Joi.object({
 });
 export const joivalidatePassword = (details={}, state=()=>{}) => {
   const { error } = joiPasswordSchema.validate(details, { abortEarly: false });
+  if (!error) return true;
+  const newErrors = error.details.reduce(
+    (acc, detail) => ({
+      ...acc,
+      [detail.path[0]]: detail.message.replace(/"/g, ""),
+    }),
+    {}
+  );
+  state(newErrors);
+  return false;
+}; 
+
+export const joiValidateSignUp = (details={}, state=()=>{}) => {
+  const { error } = joiSignUpSchema.validate(details, { abortEarly: false });
   if (!error) return true;
   const newErrors = error.details.reduce(
     (acc, detail) => ({

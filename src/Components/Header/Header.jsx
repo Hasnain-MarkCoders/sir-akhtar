@@ -6,6 +6,7 @@ import {
   contactHeaderData,
   darkSocialMediaHandles,
   headerIcons,
+  manageContent,
   tabsArray,
 } from "../../utils/utils.jsx";
 import darklogo from "./../../assets/images/darklogo.png";
@@ -18,10 +19,14 @@ import { upateNewsCards } from "../../Redux/Slice/NewsSlice/NewsSlice.js";
 import { updateProductsCards } from "../../Redux/Slice/ProductSlice/ProductSlice.js";
 import { handleAuth } from "../../Redux/Slice/UserSlice/UserSlice.js";
 import { handleSnackAlert } from "../../Redux/Slice/SnackAlertSlice/SnackAlertSlice.js";
+import CustomDropDown from "../CustomDropDown/CustomDropDown.jsx";
+import { youtubeGetPlaylists } from "../../API/Requests/Requests.js";
+export const channelId = "UCCX0xW7dc8ZehP5OMshg_AQ"
 const Header = () => {
   const dispatch = useDispatch()
-  const news = useSelector(state=>state.news)
-  const auth = useSelector(state=>state.auth)
+  const news = useSelector(state=>state?.news)
+  const auth = useSelector(state=>state?.auth)
+  const isAdmin = auth?.user?.type==="admin"
   const navigate = useNavigate();
   const {pathname} = useLocation()
   const [value, setValue] = React.useState(0);
@@ -82,6 +87,12 @@ const Header = () => {
 
   }
   const headerIconsConditionallyRender = headerIcons.filter(item=>item.condition(auth))
+  React.useEffect(()=>{
+    (async()=>{
+        const res =await youtubeGetPlaylists(channelId)
+        console.log(res)
+    })()
+},[])
   return (
     <Box sx={{ width: "100%" }}>
    
@@ -118,6 +129,7 @@ const Header = () => {
                 }}
               />
             ))}
+          {isAdmin && <CustomDropDown title={"Manage Content"} data={manageContent}/>}
           </Tabs>
         </Box>
         <Box>

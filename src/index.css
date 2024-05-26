@@ -23,6 +23,8 @@
   background-repeat: no-repeat;
   background-size: cover;
   min-height: 79px;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .outlet {

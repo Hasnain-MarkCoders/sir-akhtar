@@ -65,9 +65,7 @@ const Drawer = () => {
         onClick={toggleDrawer(true)}
         sx={{
           minWidth: "",
-          padding: "0px",
-          mt: "20px",
-          ml: "15px",
+          padding: "20px",
         }}
       >
         <CiMenuBurger
@@ -104,7 +102,7 @@ const Drawer = () => {
         left:"30px"
       }}>
       {
-        headerIconsConditionallyRender(auth, false, cb).map(item=><>{item.icon}</>)
+        headerIconsConditionallyRender(auth, false, cb).map((item, index)=><div key={index}>{item.icon}</div>)
       }
        
       </Box>

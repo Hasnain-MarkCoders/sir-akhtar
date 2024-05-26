@@ -2,16 +2,23 @@ import React, {useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import openEye from "./../../assets/images/eye.png";
 import closeEye from "./../../assets/images/closed-eye.png";
-import { ValidateEmptyFields, joivalidatePassword } from "../../utils/utils";
-const Signup = ({cb=()=>{}, toggleAuthForm=()=>{}}) => {
+import { ValidateEmptyFields, joiValidateSignUp, joivalidatePassword } from "../../utils/utils";
+import { Register } from "../../API/EndPoints/Endpoints";
+import { useDispatch } from "react-redux";
+import { handleAuth } from "../../Redux/Slice/UserSlice/UserSlice";
+import { handleSnackAlert } from "../../Redux/Slice/SnackAlertSlice/SnackAlertSlice";
+const Signup = ({cb=()=>{}, toggleAuthForm=()=>{}, closeAuthForm=()=>{}}) => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [details, setDetails] = useState({
     email: "",
     password: "",
+    username:""
   });
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+    username:""
   });
   const [isOpenEye, setOpenEye] = useState(closeEye);
   const [disabled, setDisabled] = useState(true);
@@ -31,21 +38,36 @@ const Signup = ({cb=()=>{}, toggleAuthForm=()=>{}}) => {
     setIsLoading(true);
     setDisabled(true)
     cb()
-    const isValid = joivalidatePassword(details, setErrors);
+    const isValid = joiValidateSignUp(details, setErrors);
     if (isValid) {
       setErrors({});
-      let res ={success:true};
-      if (res?.success) {
-             setTimeout(()=>{
-            cb()
+        const response = await Register(details)
+        console.log(response)
+      if (response?.success) {
+            const data = {user: response.user, token:response.token, authenticated:true }
+            dispatch(handleAuth(data))
             setIsLoading(false)
             setDisabled(false)
-        }, 5000)
-         
-      }   else{
+            cb()
+            closeAuthForm()
+            dispatch(handleSnackAlert( {
+              open:true,
+              severity:"success",
+              message:"Sign up successfully."
+          }))
+      } 
+      
+      else{
         cb()
         setDisabled(false)
         setIsLoading(false);
+        dispatch(handleSnackAlert( {
+          open:true,
+          severity:"error",
+          message:"Sign up Failed."
+      }))
+      // closeAuthForm()
+
       }
       
      
@@ -64,6 +86,23 @@ const Signup = ({cb=()=>{}, toggleAuthForm=()=>{}}) => {
         <div className="form-container">
           <p className="title">Welcome 🎉</p>
           <form className="form">
+          <div>
+              <input
+                onChange={(e) => {
+                    setIsLoading(false)
+                    setDisabled(false);
+                    setDetails((prev) => ({
+                    ...prev,
+                    [e.target.name]: e.target.value,
+                  }));
+                }}
+                type="text"
+                className="input"
+                name="username"
+                placeholder="Name"
+              />
+              <p className="error">{errors["username"] ? errors["username"] : ""}</p>
+            </div>
             <div>
               <input
                 onChange={(e) => {
